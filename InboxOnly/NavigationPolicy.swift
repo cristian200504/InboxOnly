@@ -53,4 +53,16 @@ struct NavigationPolicy {
         return .blocked
     }
 
+    // Child frames need broader access for login challenges and media, but
+    // must not launch Instagram or load an embedded Reel viewer.
+    func blocksEmbeddedNavigation(_ url: URL) -> Bool {
+        let browserSchemes = ["https", "http", "about", "blob", "data", "javascript"]
+        guard let scheme = url.scheme?.lowercased(), browserSchemes.contains(scheme) else { return true }
+        guard let host = url.host?.lowercased(), rules.hosts.contains(host) else { return false }
+        let path = url.standardized.path
+        return ["/reel", "/reels", "/clips"].contains {
+            path == $0 || path.hasPrefix($0 + "/")
+        }
+    }
+
 }

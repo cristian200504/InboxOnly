@@ -51,6 +51,7 @@ jobs:
           test -f "$app_path/guard.js"
           test -f "$app_path/policy.js"
           test -f "$app_path/navigation-rules.json"
+          test -f "$app_path/Assets.car"
           mkdir -p "$RUNNER_TEMP/inboxonly-ipa/Payload"
           cp -R "$app_path" "$RUNNER_TEMP/inboxonly-ipa/Payload/InboxOnly.app"
           cd "$RUNNER_TEMP/inboxonly-ipa"
