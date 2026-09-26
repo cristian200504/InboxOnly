@@ -1,0 +1,18 @@
+{
+  "inboxURL": "https://www.instagram.com/direct/inbox/",
+  "hosts": ["www.instagram.com", "instagram.com"],
+  "messagePrefixes": ["/direct"],
+  "authenticationPrefixes": [
+    "/accounts/login",
+    "/accounts/logout",
+    "/accounts/onetap",
+    "/accounts/two_factor_login",
+    "/accounts/password/reset",
+    "/accounts/password/change",
+    "/challenge",
+    "/checkpoint",
+    "/consent",
+    "/privacy/consent",
+    "/terms/accept"
+  ]
+}

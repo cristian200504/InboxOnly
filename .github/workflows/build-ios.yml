@@ -1,0 +1,65 @@
+name: Build unsigned iPhone app
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node for route tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Test navigation protection
+        run: node --test tests/*.test.cjs
+
+      - name: Build for iPhone and iPad
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          xcodebuild \
+            -project InboxOnly.xcodeproj \
+            -scheme InboxOnly \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' \
+            build
+
+      - name: Package unsigned IPA for AltStore
+        shell: bash
+        run: |
+          set -euo pipefail
+          app_path="$GITHUB_WORKSPACE/build/DerivedData/Build/Products/Release-iphoneos/InboxOnly.app"
+          test -f "$app_path/InboxOnly"
+          test -f "$app_path/Info.plist"
+          test -f "$app_path/guard.js"
+          test -f "$app_path/policy.js"
+          test -f "$app_path/navigation-rules.json"
+          mkdir -p "$RUNNER_TEMP/inboxonly-ipa/Payload"
+          cp -R "$app_path" "$RUNNER_TEMP/inboxonly-ipa/Payload/InboxOnly.app"
+          cd "$RUNNER_TEMP/inboxonly-ipa"
+          /usr/bin/zip -q -r "$GITHUB_WORKSPACE/build/InboxOnly-unsigned.ipa" Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: InboxOnly-unsigned
+          path: build/InboxOnly-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14

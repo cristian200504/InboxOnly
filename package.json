@@ -1,0 +1,11 @@
+{
+  "name": "inboxonly",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal Instagram messages-only web client and Safari userscript",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "build:userscript": "node scripts/build-userscript.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
